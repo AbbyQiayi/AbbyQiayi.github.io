@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="R包因为其开源，版本控制一直做的很狗，每次下载R包都是心中祈祷千万不要版本冲突。遇到版本冲突问题，对于初学者来说基本就是一个小时起步的trouble-shooting。   下面就是在我稀里糊涂安不上R和R包tximport时，借师兄神力后总结的过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="002- Linux学习02-安装R和R包tximport：和version conflict作斗争">
+<meta property="og:url" content="http://example.com/2023/02/24/002-Linux%E5%AD%A6%E4%B9%A002-%E5%AE%89%E8%A3%85R%E5%92%8CR%E5%8C%85%EF%BC%9A%E5%92%8Cversion-conflict%E4%BD%9C%E6%96%97%E4%BA%89/index.html">
+<meta property="og:site_name" content="BIOINFOISLAND">
+<meta property="og:description" content="R包因为其开源，版本控制一直做的很狗，每次下载R包都是心中祈祷千万不要版本冲突。遇到版本冲突问题，对于初学者来说基本就是一个小时起步的trouble-shooting。   下面就是在我稀里糊涂安不上R和R包tximport时，借师兄神力后总结的过程。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-02-24T12:42:52.000Z">
+<meta property="article:modified_time" content="2023-02-24T13:32:05.935Z">
+<meta property="article:author" content="Qiayi">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Trouble-shooting">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/02/24/002-Linux%E5%AD%A6%E4%B9%A002-%E5%AE%89%E8%A3%85R%E5%92%8CR%E5%8C%85%EF%BC%9A%E5%92%8Cversion-conflict%E4%BD%9C%E6%96%97%E4%BA%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>002- Linux学习02-安装R和R包tximport：和version conflict作斗争 | BIOINFOISLAND</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">BIOINFOISLAND</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/24/002-Linux%E5%AD%A6%E4%B9%A002-%E5%AE%89%E8%A3%85R%E5%92%8CR%E5%8C%85%EF%BC%9A%E5%92%8Cversion-conflict%E4%BD%9C%E6%96%97%E4%BA%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.name2012.com/uploads/allimg/2015-04/26-011155_74.jpg">
+      <meta itemprop="name" content="Qiayi">
+      <meta itemprop="description" content="An island where we record bioinformatics learning process.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BIOINFOISLAND">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          002- Linux学习02-安装R和R包tximport：和version conflict作斗争
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-02-24 20:42:52 / Modified: 21:32:05" itemprop="dateCreated datePublished" datetime="2023-02-24T20:42:52+08:00">2023-02-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Linux学习笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>R包因为其开源，版本控制一直做的很狗，每次下载R包都是心中祈祷千万不要版本冲突。遇到版本冲突问题，对于初学者来说基本就是一个小时起步的trouble-shooting。  </p>
+<p>下面就是在我稀里糊涂安不上R和R包tximport时，借师兄神力后总结的过程。</p>
+<span id="more"></span>
+<h3 id="安装R"><a href="#安装R" class="headerlink" title="安装R"></a>安装R</h3><p>以下是部分错误做法，是我在CSDN上找的R在Linux上的安装。<br>注意：这是一个低版本的R，后续会介绍如何update R</p>
+<h4 id="Bad-install"><a href="#Bad-install" class="headerlink" title="Bad install"></a>Bad install</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建新的环境R3.6</span></span><br><span class="line">conda create -n R3.6</span><br><span class="line"><span class="comment">#激活该环境</span></span><br><span class="line">conda activate R3.6</span><br><span class="line"><span class="comment">#在conda中找r</span></span><br><span class="line">conda search r</span><br><span class="line"><span class="comment">#下载</span></span><br><span class="line">conda install r -base</span><br></pre></td></tr></table></figure>
+<p>由于R的版本问题，安装R包时，会产生冲突。因此，<strong>我们多半会选择当前最高版本的R进行安装。</strong><br>这个故事告诉我们，不要在CSDN上乱学方法，还是要沉下心来<strong>看官网教程和软件的参数文件</strong>。<strong>在下游的分析中，Bioconductor提供的官方教程让生信小白们如有神助。</strong></p>
+<h4 id="Update-R"><a href="#Update-R" class="headerlink" title="Update R"></a>Update R</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Update R</span></span><br><span class="line">conda uninstall r -base</span><br><span class="line"><span class="comment">#然后就是漫长的等待过程</span></span><br><span class="line"><span class="comment">#install </span></span><br><span class="line">conda install r -base=4.2</span><br><span class="line"><span class="comment">#又是漫长的等待</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="安装r包-tximport"><a href="#安装r包-tximport" class="headerlink" title="安装r包: tximport"></a>安装r包: tximport</h3><p>之前我用v3.6的R安装tximport的时候总是有特别长报错，其中是R在检查版本的时候发现了许多冲突。基于这个问题，师兄帮我把R升级到了v4.2，就可以成功下载tximport了。</p>
+<p>安装R包一般有<strong>两种方法</strong>，分别为用conda和安装软件一样安装，以及在R的环境中，用R的代码安装（和本地安装相同）。</p>
+<h4 id="法一：用conda-安装"><a href="#法一：用conda-安装" class="headerlink" title="法一：用conda 安装"></a>法一：用conda 安装</h4><p>这里我们查看<a target="_blank" rel="noopener" href="https://anaconda.org/bioconda/r-tximport">bioconda官网</a>的安装教程。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#To install this package run one of the following:</span></span><br><span class="line">conda install -c bioconda r-tximport</span><br><span class="line">conda install -c <span class="string">&quot;bioconda/label/cf201901&quot;</span> r-tximport</span><br></pre></td></tr></table></figure>
+
+<p>但我发现这个方法似乎不work,于是我又去请教了神奇的师兄，师兄帮我用老套路成功装上了tximport。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conda search tximport</span><br><span class="line"><span class="comment">#还是老方法好用！官网有时也不靠谱啊！</span></span><br><span class="line">conda install -c bioconda bioconductor-tximport </span><br></pre></td></tr></table></figure>
+
+<h4 id="法二：在R的环境中安装"><a href="#法二：在R的环境中安装" class="headerlink" title="法二：在R的环境中安装"></a>法二：在R的环境中安装</h4><p>我们同样可以在<a target="_blank" rel="noopener" href="https://bioconductor.org/packages/release/bioc/html/tximport.html">Biocondutor官网</a>查看安装指南。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#启动R</span></span><br><span class="line">R</span><br><span class="line"><span class="comment">#按照和本地一样的命令安装tximport</span></span><br><span class="line">BiocManager::install(<span class="string">&quot;tximport&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在这里祝愿所有人可以高效快速解决R包安装的版本问题！</p>
+<h4 id="后话"><a href="#后话" class="headerlink" title="后话"></a>后话</h4><p>由于我实在不习惯在Linux黑咕隆咚的背景下，看不到变量，两眼一抹黑一通操作。后续下游的分析我还是用本地的Rstudio来完成。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Trouble-shooting/" rel="tag"># Trouble-shooting</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/02/24/001-Linux%E5%AD%A6%E4%B9%A001-%E5%AE%89%E8%A3%85%E7%94%9F%E4%BF%A1%E8%BD%AF%E4%BB%B6%E7%9A%84%E9%82%A3%E4%BA%9B%E5%9D%91/" rel="prev" title="001- Linux学习01-安装生信软件的那些坑">
+      <i class="fa fa-chevron-left"></i> 001- Linux学习01-安装生信软件的那些坑
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/24/003-Linux%E5%AD%A6%E4%B9%A003-fastqc%E6%B2%A1%E6%9C%89%E6%89%BE%E5%88%B0input%E7%9A%84%E5%8F%82%E6%95%B0%EF%BC%9F%E5%A6%82%E4%BD%95%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C/" rel="next" title="003- Linux学习03-fastqc没有找到input的参数？如何批量操作? multiqc">
+      003- Linux学习03-fastqc没有找到input的参数？如何批量操作? multiqc <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85R"><span class="nav-number">1.</span> <span class="nav-text">安装R</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bad-install"><span class="nav-number">1.1.</span> <span class="nav-text">Bad install</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Update-R"><span class="nav-number">1.2.</span> <span class="nav-text">Update R</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85r%E5%8C%85-tximport"><span class="nav-number">2.</span> <span class="nav-text">安装r包: tximport</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%95%E4%B8%80%EF%BC%9A%E7%94%A8conda-%E5%AE%89%E8%A3%85"><span class="nav-number">2.1.</span> <span class="nav-text">法一：用conda 安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%95%E4%BA%8C%EF%BC%9A%E5%9C%A8R%E7%9A%84%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%AE%89%E8%A3%85"><span class="nav-number">2.2.</span> <span class="nav-text">法二：在R的环境中安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8E%E8%AF%9D"><span class="nav-number">2.3.</span> <span class="nav-text">后话</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Qiayi"
+      src="http://img.name2012.com/uploads/allimg/2015-04/26-011155_74.jpg">
+  <p class="site-author-name" itemprop="name">Qiayi</p>
+  <div class="site-description" itemprop="description">An island where we record bioinformatics learning process.</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-02 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Qiayi</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
