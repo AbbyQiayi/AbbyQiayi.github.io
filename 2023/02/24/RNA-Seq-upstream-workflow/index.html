@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://example.com/RNA-Seq-upstream-workflow/fastqc_output.png">
 <meta property="og:image" content="http://example.com/RNA-Seq-upstream-workflow/multiqc_output.png">
 <meta property="article:published_time" content="2023-02-24T06:35:56.000Z">
-<meta property="article:modified_time" content="2023-02-24T10:16:58.378Z">
+<meta property="article:modified_time" content="2023-02-25T12:07:50.063Z">
 <meta property="article:author" content="Qiayi">
 <meta property="article:tag" content="RNA-Seq">
 <meta name="twitter:card" content="summary">
@@ -191,17 +191,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-02-24 14:35:56 / Modified: 18:16:58" itemprop="dateCreated datePublished" datetime="2023-02-24T14:35:56+08:00">2023-02-24</time>
+              <time title="Created: 2023-02-24 14:35:56" itemprop="dateCreated datePublished" datetime="2023-02-24T14:35:56+08:00">2023-02-24</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-02-25 20:07:50" itemprop="dateModified" datetime="2023-02-25T20:07:50+08:00">2023-02-25</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/RNA-Seq/" itemprop="url" rel="index"><span itemprop="name">RNA-Seq</span></a>
+                  <a href="/categories/RNA-Seq-Workflow/" itemprop="url" rel="index"><span itemprop="name">RNA-Seq Workflow</span></a>
                 </span>
             </span>
 
@@ -262,7 +268,7 @@
 
 <p>The content of bash file is as follow:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#Define the variables: Usually the path</span></span><br><span class="line"><span class="comment">#Find: find out files with patterns </span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /data/sdd/zhaqiayi/salmon_try</span><br><span class="line">list1=$(find /data/raw_data/linpeng/MEPCE_RNA/ -name <span class="string">&quot;*1.fq.gz&quot;</span>)</span><br><span class="line">list2=$(find /data/raw_data/linpeng/MEPCE_RNA/ -name <span class="string">&quot;*2.fq.gz&quot;</span>)</span><br><span class="line">list3=$(find /data/raw_data/linpeng/MEPCE_RNA/ -name <span class="string">&quot;*1.fq.gz&quot;</span> |sed <span class="string">&#x27;s#.*/##&#x27;</span>)</span><br><span class="line">ref_genome=/software/ReferenceData/Human/GRCh38_hg38.p13/Software_index/salmonV1.9_EnsemblV108</span><br></pre></td></tr></table></figure>
-<p>&#x3D;&#x3D;<strong>Notes:</strong>&#x3D;&#x3D;</p>
+<p><strong>Notes:</strong></p>
 <ol>
 <li>Define variables: There is <strong>no blank space between ‘&#x3D;’</strong>.</li>
 <li>Some parameters can be easily change for different projects by <strong>defining variables</strong>. </li>
@@ -271,7 +277,7 @@
 </ol>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#transfer string to list</span></span><br><span class="line">list1_x=(<span class="variable">$list1</span>)</span><br><span class="line">list2_x=(<span class="variable">$list2</span>)</span><br><span class="line">list3_x=(<span class="variable">$list3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#length</span></span><br><span class="line">length=<span class="variable">$&#123;#list1_x[@]&#125;</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">#for loop</span></span><br><span class="line"><span class="comment">#use absolute path for calling salmon program</span></span><br><span class="line"><span class="comment">#.* any character</span></span><br><span class="line"><span class="keyword">for</span> ((i=<span class="number">0</span>; i&lt;<span class="variable">$&#123;length&#125;</span>; i++));</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">   /data/sdd/zhaqiayi/download/salmon-1.9.0_linux_x86_64/bin/salmon quant -i <span class="variable">$ref_genome</span> -l A -1 <span class="variable">$&#123;list1_x[$i]&#125;</span>  -2 <span class="variable">$&#123;list1_x[$i]/%1.fq.gz/2.fq.gz&#125;</span> -o /data/sdd/zhaqiayi/salmon_try/<span class="variable">$&#123;list3_x[$i]/%.fq.gz/&#125;</span>/ -p 12</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 
-<p>&#x3D;&#x3D;<strong>Notes:</strong>&#x3D;&#x3D;</p>
+<p><strong>Notes:</strong></p>
 <ol>
 <li>Use <strong>absolute path for calling salmon program</strong>, which doesn’t rely on environment. </li>
 <li><strong>Pattern matching</strong> for a language.</li>
@@ -384,7 +390,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
