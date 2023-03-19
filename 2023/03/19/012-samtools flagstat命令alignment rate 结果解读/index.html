@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="samtools flagstat 简介定义：Each category in the output is broken down into QC pass and QC fail. In the default output format, these are presented as “#PASS + #FAIL” followed by a description of the catego">
+<meta property="og:type" content="article">
+<meta property="og:title" content="012-samtools flagstat命令alignment rate 结果解读">
+<meta property="og:url" content="http://example.com/2023/03/19/012-samtools%20flagstat%E5%91%BD%E4%BB%A4alignment%20rate%20%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/index.html">
+<meta property="og:site_name" content="BIOINFOISLAND">
+<meta property="og:description" content="samtools flagstat 简介定义：Each category in the output is broken down into QC pass and QC fail. In the default output format, these are presented as “#PASS + #FAIL” followed by a description of the catego">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-03-19T10:15:53.000Z">
+<meta property="article:modified_time" content="2023-03-19T11:49:59.607Z">
+<meta property="article:author" content="Qiayi">
+<meta property="article:tag" content="ChIP-seq">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/03/19/012-samtools%20flagstat%E5%91%BD%E4%BB%A4alignment%20rate%20%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>012-samtools flagstat命令alignment rate 结果解读 | BIOINFOISLAND</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">BIOINFOISLAND</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/19/012-samtools%20flagstat%E5%91%BD%E4%BB%A4alignment%20rate%20%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.name2012.com/uploads/allimg/2015-04/26-011155_74.jpg">
+      <meta itemprop="name" content="Qiayi">
+      <meta itemprop="description" content="An island where we record bioinformatics learning process.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BIOINFOISLAND">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          012-samtools flagstat命令alignment rate 结果解读
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-03-19 18:15:53 / Modified: 19:49:59" itemprop="dateCreated datePublished" datetime="2023-03-19T18:15:53+08:00">2023-03-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ChIP-seq/" itemprop="url" rel="index"><span itemprop="name">ChIP-seq</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ChIP-seq/Linux-%E5%91%BD%E4%BB%A4/" itemprop="url" rel="index"><span itemprop="name">Linux 命令</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="samtools-flagstat-简介"><a href="#samtools-flagstat-简介" class="headerlink" title="samtools flagstat 简介"></a>samtools flagstat 简介</h3><p><strong>定义：</strong><br>Each category in the output is broken down into QC pass and QC fail. In the default output format, these are presented as “#PASS + #FAIL” followed by a description of the category.<br>我们这边用flagstat来<strong>输出bowtie2 mapping后的比对率等信息</strong>。</p>
+<span id="more"></span>
+
+<h3 id="samtools-flagstat-使用"><a href="#samtools-flagstat-使用" class="headerlink" title="samtools flagstat 使用"></a>samtools flagstat 使用</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">samtools flagstat &lt;in.bam&gt; |&lt;in.sam&gt; | &lt;in.cram&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以将bowtie2比对之后的<code>.sam</code>或者排序后的<code>.bam</code>文件作为输入，输出其比对结果。</p>
+<h3 id="samtools-flagstat-结果分析"><a href="#samtools-flagstat-结果分析" class="headerlink" title="samtools flagstat 结果分析"></a>samtools flagstat 结果分析</h3><p>由于在使用bowtie2进行比对之后，屏幕上会输出相关的比对结果。这里我们将屏幕输出与flagstat输出相比较，来解读其结果。</p>
+<h4 id="bowtie2屏幕输出："><a href="#bowtie2屏幕输出：" class="headerlink" title="bowtie2屏幕输出："></a>bowtie2屏幕输出：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">25730997 reads; of these:</span><br><span class="line">  25730997 (100.00%) were paired; of these:</span><br><span class="line">    5667933 (22.03%) aligned concordantly 0 <span class="built_in">times</span></span><br><span class="line">    11422092 (44.39%) aligned concordantly exactly 1 time</span><br><span class="line">    8640972 (33.58%) aligned concordantly &gt;1 <span class="built_in">times</span></span><br><span class="line">    ----</span><br><span class="line">    5667933 pairs aligned concordantly 0 <span class="built_in">times</span>; of these:</span><br><span class="line">      2612337 (46.09%) aligned discordantly 1 time</span><br><span class="line">    ----</span><br><span class="line">    3055596 pairs aligned 0 <span class="built_in">times</span> concordantly or discordantly; of these:</span><br><span class="line">      6111192 mates make up the pairs; of these:</span><br><span class="line">        1436707 (23.51%) aligned 0 <span class="built_in">times</span></span><br><span class="line">        1453245 (23.78%) aligned exactly 1 time</span><br><span class="line">        3221240 (52.71%) aligned &gt;1 <span class="built_in">times</span></span><br><span class="line">97.21% overall alignment rate</span><br></pre></td></tr></table></figure>
+
+<p>这个输出看似好理解，实则有点抽象。其中，什么时concordantly，什么时discordantly，又为什么这样分类，搞得人有点糊涂。</p>
+<h5 id="bowtie2-result"><a href="#bowtie2-result" class="headerlink" title="bowtie2 result"></a>bowtie2 result</h5><p>关于bowtie2的结果解读，我们参考这篇博文：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/409433959">Bowtie2简介</a>，这里清晰地介绍了Aligned concordantly，discordantly, Multiple alignments 这些概念。</p>
+<p><strong>但我仍然有几个疑惑：</strong>  （注：我们这里的输入是paired end）</p>
+<h5 id="疑问1"><a href="#疑问1" class="headerlink" title="疑问1"></a>疑问1</h5><p>为什么discordantly这种比对结果没有&gt;1的分类?</p>
+<p><strong>可能的原因：</strong>  discordantly是指那些可以pair上，成对align时，方向不正确的序列；或是方向正确，但距离很远的序列。这些序列可能出现在一些特殊的序列结构中，如回文结构。成对出现的这种discordant情况只能align上一次。</p>
+<h5 id="疑问2"><a href="#疑问2" class="headerlink" title="疑问2"></a>疑问2</h5><p>为什么alignment rate中，要包含那些discordant和单个align上的数据？</p>
+<p><strong>可能的原因：</strong> 染色质的空间结构是很复杂的，forward和reverse不对应的产生有很多种具有生物依据的可能。严谨来说，不能那么轻易就排除不对应的情况为错误的。</p>
+<h4 id="samtools-flagstat-结果"><a href="#samtools-flagstat-结果" class="headerlink" title="samtools flagstat 结果:"></a>samtools flagstat 结果:</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">51461994 + 9 <span class="keyword">in</span> total (0C-passed reads + 0C-failed reads) + 0 secondary + 0 supplementary</span><br><span class="line"> + 0 duplicates</span><br><span class="line">50025287 + 0 mapped (97.21% : N/A)</span><br><span class="line">51461994 + 9 paired <span class="keyword">in</span> sequencing</span><br><span class="line">25730997 +  read1</span><br><span class="line">25739997 + 0 read2</span><br><span class="line">40126128 + 0 properly paired (77.97% : N/A)</span><br><span class="line">49222496 + 0 with itself and mate mapped</span><br><span class="line">802791 + 9 singletons (1.56% : N/A)</span><br><span class="line">918714 + 9 with mate mapped to a different chr</span><br><span class="line">349963 + 0 with mate mapped to a different chr (map0&gt;=5)</span><br></pre></td></tr></table></figure>
+
+<p>网上的解释是这样的：<br>从第一行至第十一行分别表示：</p>
+<pre><code>    1.  QC pass的reads的数量为51461994，未通过QC的reads数量为0，意味着一共有25730997条reads（paired end）；
+
+    2.  重复reads的数量，QC pass和failed
+
+    3.  比对到参考基因组上的reads数量；
+
+    4.  paired reads数据数量；
+
+    5.  read1的数量；
+
+    6.  read2 的数量；
+
+    7.  正确地匹配到参考序列的reads数量；
+
+    8.  一对reads都比对到了参考序列上的数量，但是并不一定比对到同一条染色体上；
+
+    9.  一对reads中只有一条与参考序列相匹配的数量； 
+
+    10.  一对reads比对到不同染色体的数量；
+
+    11.  一对reads比对到不同染色体的且比对质量值大于5的数量。
+</code></pre>
+<p><strong>我们对应前面的bowtie2屏幕输出:</strong></p>
+<blockquote>
+<p>第三行： 表示alignment rate: 97.21% &#x3D; 100.00% * (44.39%+33.58%) + 22.03% * 46.09% + 22.03% * (1-46.09%)*(23.78%+52.71%);<br>第七行： 表示align concordantly的reads 77.97% &#x3D; 44.39%+33.58%;<br>第八九行： with itself and mate mapped+singletons&#x3D; total reads.</p>
+</blockquote>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>在使用一个软件时，我们要<strong>认真看懂其输出的结果每一行是什么意思</strong>，可不能就看一个alignment rate就稀里糊涂划过去了！另外，我们可以用<code>|tee xxx.log</code><strong>将屏幕上的结果输出到文件中进行存储</strong>。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ChIP-seq/" rel="tag"># ChIP-seq</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/18/011-%E5%88%9D%E8%AF%86ChIP-seq/" rel="prev" title="011-初识ChIP-seq">
+      <i class="fa fa-chevron-left"></i> 011-初识ChIP-seq
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#samtools-flagstat-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">samtools flagstat 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#samtools-flagstat-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">samtools flagstat 使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#samtools-flagstat-%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">samtools flagstat 结果分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bowtie2%E5%B1%8F%E5%B9%95%E8%BE%93%E5%87%BA%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">bowtie2屏幕输出：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#bowtie2-result"><span class="nav-number">3.1.1.</span> <span class="nav-text">bowtie2 result</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%96%91%E9%97%AE1"><span class="nav-number">3.1.2.</span> <span class="nav-text">疑问1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%96%91%E9%97%AE2"><span class="nav-number">3.1.3.</span> <span class="nav-text">疑问2</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#samtools-flagstat-%E7%BB%93%E6%9E%9C"><span class="nav-number">3.2.</span> <span class="nav-text">samtools flagstat 结果:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">总结：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Qiayi"
+      src="http://img.name2012.com/uploads/allimg/2015-04/26-011155_74.jpg">
+  <p class="site-author-name" itemprop="name">Qiayi</p>
+  <div class="site-description" itemprop="description">An island where we record bioinformatics learning process.</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-02 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Qiayi</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
