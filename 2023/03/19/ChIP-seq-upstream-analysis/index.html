@@ -20,20 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="我是上周开始接触ChIP-seq的。">
+  <meta name="description" content="Overview pre-alignment QC: FastQC -&gt; Trim-galore -&gt; FastQC  alignment: Bowtie2&#x2F;BWA post-alignment QC: cross-correlation analysis call peaks: MACS QC: FRiP&#x2F;RiBL  It seems that we should">
 <meta property="og:type" content="article">
-<meta property="og:title" content="011-初识ChIP-seq">
-<meta property="og:url" content="http://example.com/2023/03/18/011-%E5%88%9D%E8%AF%86ChIP-seq/index.html">
+<meta property="og:title" content="ChIP-seq upstream analysis">
+<meta property="og:url" content="http://example.com/2023/03/19/ChIP-seq-upstream-analysis/index.html">
 <meta property="og:site_name" content="BIOINFOISLAND">
-<meta property="og:description" content="我是上周开始接触ChIP-seq的。">
+<meta property="og:description" content="Overview pre-alignment QC: FastQC -&gt; Trim-galore -&gt; FastQC  alignment: Bowtie2&#x2F;BWA post-alignment QC: cross-correlation analysis call peaks: MACS QC: FRiP&#x2F;RiBL  It seems that we should">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-03-18T06:31:19.000Z">
-<meta property="article:modified_time" content="2023-03-19T06:45:21.033Z">
+<meta property="article:published_time" content="2023-03-19T11:53:19.000Z">
+<meta property="article:modified_time" content="2023-03-19T12:29:47.943Z">
 <meta property="article:author" content="Qiayi">
 <meta property="article:tag" content="ChIP-seq">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2023/03/18/011-%E5%88%9D%E8%AF%86ChIP-seq/">
+<link rel="canonical" href="http://example.com/2023/03/19/ChIP-seq-upstream-analysis/">
 
 
 <script id="page-configurations">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>011-初识ChIP-seq | BIOINFOISLAND</title>
+  <title>ChIP-seq upstream analysis | BIOINFOISLAND</title>
   
 
 
@@ -166,7 +166,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/18/011-%E5%88%9D%E8%AF%86ChIP-seq/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/19/ChIP-seq-upstream-analysis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.name2012.com/uploads/allimg/2015-04/26-011155_74.jpg">
@@ -179,7 +179,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          011-初识ChIP-seq
+          ChIP-seq upstream analysis
         </h1>
 
         <div class="post-meta">
@@ -188,23 +188,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2023-03-18 14:31:19" itemprop="dateCreated datePublished" datetime="2023-03-18T14:31:19+08:00">2023-03-18</time>
+              <time title="Created: 2023-03-19 19:53:19 / Modified: 20:29:47" itemprop="dateCreated datePublished" datetime="2023-03-19T19:53:19+08:00">2023-03-19</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-03-19 14:45:21" itemprop="dateModified" datetime="2023-03-19T14:45:21+08:00">2023-03-19</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ChIP-seq/" itemprop="url" rel="index"><span itemprop="name">ChIP-seq</span></a>
+                  <a href="/categories/ChIP-seq-Workflow/" itemprop="url" rel="index"><span itemprop="name">ChIP-seq Workflow</span></a>
                 </span>
             </span>
 
@@ -219,56 +213,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>我是上周开始接触ChIP-seq的。  </p>
+        <h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><ul>
+<li>pre-alignment QC: FastQC -&gt; Trim-galore -&gt; FastQC </li>
+<li>alignment: Bowtie2&#x2F;BWA</li>
+<li>post-alignment QC: cross-correlation analysis</li>
+<li>call peaks: MACS</li>
+<li>QC: FRiP&#x2F;RiBL</li>
+</ul>
+<p>It seems that we should conduct quality control after each step.</p>
 <span id="more"></span>
 
-<p>师兄说，首先要了解一下<strong>ChIP的实验怎么做</strong>，以及各种实验方法的<strong>侧重点和优缺点</strong>。然后，是ChIP-seq分析的<strong>pipeline</strong>,以及各种<strong>常用的算法</strong>。之后，就拿一些数据<strong>实操</strong>一下。  </p>
-<p>然而，由于对刘小乐老师由衷的喜爱，我先去看了她的<a target="_blank" rel="noopener" href="https://liulab-dfci.github.io/resources/html/STAT115_2020_Module2.html">STAT115 Module2</a>关于ChIP-seq的公开课。课程内容些庞杂（不仅仅是ChIP-seq相关的实验方法和分析,还有许多关于epigenetics的内容及算法），大致如下：    </p>
-<blockquote>
-<p><strong>Transcription Factor Motif Finding：</strong></p>
-<ul>
-<li>Sequence Logo</li>
-<li>Known motif scans from Jaspar, HOMER, FactorBook or Hocomoco</li>
-<li>De novo motif finding: Positive weight matrix update;Expectation maximization: MEME; Gibbs Sampler</li>
-<li>Use conservation and motif modules (redundant and combinatoriamotif in poximity) to improve signal to noise</li>
-</ul>
-</blockquote>
-<blockquote>
-<p><strong>Transcription Factor ChlP-seq:</strong>  </p>
-<ul>
-<li>MACS for peak calling</li>
-<li>QC: PBC,FDR, # of peaks with &gt; FC, FRP, DHS overlap, conservation, motif enrichment</li>
-<li>TF-TF interactions:<ul>
-<li>Motif enrichment: HOMER, Cistrome</li>
-<li>ChlP-seq peak overlap: Cistrome DB Toolkit Giggle search</li>
-</ul>
-</li>
-<li>TF target genes:<ul>
-<li>Regulatory potential(# and distance)</li>
-<li>Could weight by epigenetic signal</li>
-<li>Could consider TAD boundaries or HiC</li>
-<li>Differential expression</li>
-<li>Function: GO&#x2F;GSEA</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<blockquote>
-<p><strong>Epigenetics:</strong></p>
-<ul>
-<li>DNA methylation and demethylation</li>
-<li>Nucleosome positioning(Mnase-seq)</li>
-</ul>
-</blockquote>
-<blockquote>
-<p><strong>Hidden Markov Models</strong></p>
-</blockquote>
-<p>结果，我就迷失在了知识的海洋中…  </p>
-<p>经过一番考量，我决定先整理一下各种<strong>ChIP相关实验技术</strong>，便按照<code>DNA methylation</code>（碱基层面）和<code>DNA protein interaction</code>（蛋白质层面）为分类，整理了相关实验技术内容。</p>
-<p><strong>可以点这个链接来查看具体内容：</strong></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/AbbyQiayi/AbbyQiayi.github.io/blob/main/2023/03/18/011-%E5%88%9D%E8%AF%86ChIP-seq/ChIP.pdf">ChIP background</a></p>
-<hr>
-<p><strong>p.s</strong> 可能是安装网页系统时的一些问题，我一直没办法插入图片和pdf等(尝试了各种方法还是不行)，目前只能以链接形式来展示图片:(</p>
+<h3 id="pre-alignment-QC-FastQC-amp-multiqc"><a href="#pre-alignment-QC-FastQC-amp-multiqc" class="headerlink" title="pre-alignment QC: FastQC &amp; multiqc"></a>pre-alignment QC: FastQC &amp; multiqc</h3><p>This part is similar to that in RNA-seq. We just run this as what we did before.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># fastQC</span></span><br><span class="line"><span class="comment"># -o output dir </span></span><br><span class="line"><span class="comment"># -t thread</span></span><br><span class="line"><span class="comment"># input dir is at the end of the command</span></span><br><span class="line"></span><br><span class="line">fastqc -o /data/sdd/zhaqiayi/chip/mar/00-qc -t 12 /data/sdd/guochen/20230102/20221231/*.fq.gz</span><br><span class="line">multiqc /data/sdd/zhaqiayi/chip/mar/00-qc -o /data/sdd/zhaqiayi/chip/mar/00-qc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>We find out that most of the adapters are not trimmed.</p>
+<p><strong>output:</strong><br>Click here: <a target="_blank" rel="noopener" href="https://postimg.cc/9rw71Nkr">fastqc1.png</a> </p>
+<h3 id="Trim-galore-amp-QC"><a href="#Trim-galore-amp-QC" class="headerlink" title="Trim-galore &amp; QC"></a>Trim-galore &amp; QC</h3><p>We can trim the adapters. Here we use <code>for loop</code> as before. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">list1=$(find /data/sdd/guochen/20230102/20221231/ -name <span class="string">&quot;*1_001.fastq.gz&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> file1 <span class="keyword">in</span> <span class="variable">$list1</span>;</span><br><span class="line"><span class="keyword">do</span>    </span><br><span class="line">    file2=<span class="variable">$&#123;file1/%1_001.fastq.gz/2_001.fastq.gz&#125;</span>;</span><br><span class="line">    <span class="comment"># basename: linux function for filename </span></span><br><span class="line">    fileName=`<span class="built_in">basename</span> <span class="variable">$file1</span>`; </span><br><span class="line">    <span class="comment"># sed: _.* -&gt; after _ to nothing</span></span><br><span class="line">    fileName=`<span class="built_in">echo</span> <span class="variable">$fileName</span> | sed <span class="string">&#x27;s/_.*//&#x27;</span>`;</span><br><span class="line">    output_dir=/data/sdd/zhaqiayi/chip/mar/01-trim/<span class="variable">$fileName</span></span><br><span class="line">    trim_galore --gzip -j 12 --paired -o <span class="variable">$output_dir</span> <span class="variable">$file1</span> <span class="variable">$file2</span> </span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>output:</strong><br><a target="_blank" rel="noopener" href="https://postimg.cc/qNLDMRGf">trim.png</a></p>
+<p>Then, run fastqc again to check whether the adapters are successfully trimmed.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fastqc -o /data/sdd/zhaqiayi/chip/mar/03-qc -t 12 /data/sdd/zhaqiayi/chip/mar/02-trim*.fq.gz</span><br><span class="line">multiqc /data/sdd/zhaqiayi/chip/mar/03-qc -o /data/sdd/zhaqiayi/chip/mar/03-qc</span><br></pre></td></tr></table></figure>
+
+<p>In this step we could also check the <strong>duplication level</strong>, or to say, <strong>library complexity</strong> from fastQC report.</p>
+<p>Here, we disappointed find out that the duplication level is really high（&gt;50%）, which means there are a lot of <strong>PCR bias</strong> in this data.</p>
+<p><strong>fastQC result：</strong><br>Click here: <a target="_blank" rel="noopener" href="https://postimg.cc/BPvPCgVp">duplication-level.png</a><br>Please refer to this link for more details: <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/71893930">high duplication</a></p>
 
     </div>
 
@@ -287,13 +256,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/03/05/010-%20r%E8%AF%AD%E8%A8%80-Heatmap-DESeq%E5%BD%92%E4%B8%80%E5%8C%96%E6%95%B0%E6%8D%AE/" rel="prev" title="010- r语言-Heatmap: DESeq归一化数据">
-      <i class="fa fa-chevron-left"></i> 010- r语言-Heatmap: DESeq归一化数据
+    <a href="/2023/03/19/012-samtools%20flagstat%E5%91%BD%E4%BB%A4alignment%20rate%20%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/" rel="prev" title="012-samtools flagstat命令alignment rate 结果解读">
+      <i class="fa fa-chevron-left"></i> 012-samtools flagstat命令alignment rate 结果解读
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/03/19/012-samtools%20flagstat%E5%91%BD%E4%BB%A4alignment%20rate%20%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/" rel="next" title="012-samtools flagstat命令alignment rate 结果解读">
-      012-samtools flagstat命令alignment rate 结果解读 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -352,6 +318,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pre-alignment-QC-FastQC-amp-multiqc"><span class="nav-number">2.</span> <span class="nav-text">pre-alignment QC: FastQC &amp; multiqc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Trim-galore-amp-QC"><span class="nav-number">3.</span> <span class="nav-text">Trim-galore &amp; QC</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
